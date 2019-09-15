@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "target": "es2017",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "removeComments": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "inlineSourceMap": true,
+    "pretty": true,
+    "strictNullChecks":true,
+    "strictPropertyInitialization":true,
+    "noImplicitReturns": true,
+    "incremental": true
+  },
+  "exclude": [
+    "node_modules", 
+    "dist"
+  ]
+}
