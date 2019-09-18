@@ -16,6 +16,7 @@ try {
   fs.writeFileSync(path.join(modulePath, moduleName + '.module' + '.ts'), '');
   fs.writeFileSync(path.join(modulePath, moduleName + '.interface' + '.ts'), '');
   fs.writeFileSync(path.join(modulePath, moduleName + '.dto' + '.ts'), '');
+  fs.writeFileSync(path.join(modulePath, moduleName + '.dao' + '.ts'), '');
   fs.writeFileSync(path.join(modulePath, moduleName + '.swagger' + '.ts'), '');
   fs.writeFileSync(path.join(modulePath, moduleName + '.controller' + '.ts'), '');
   fs.writeFileSync(path.join(modulePath, moduleName + '.controller.spec' + '.ts'), '');
