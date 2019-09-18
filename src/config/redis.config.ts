@@ -7,16 +7,16 @@ const redisClient = redis.createClient({
 
 redisClient.on('ready', (err) => {
   if (err) {        
-    console.error('[srj][redis.config.js]connect redis err: ', err);
+    console.error('[srj] connect redis err: ', err);
 
     return;
   }
 
-  console.log('[srj][redis.config.js]connect redis success');
+  console.debug('[srj] connect redis success');
 });
 
 redisClient.on('error', (err) => {
-  console.error('[srj][redis.config.js]redis err: ', err);
+  console.error('[srj] redis err: ', err);
 });
 
 (<any>global).redisClient = redisClient;

@@ -1,14 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
 
-import { TestEntity } from './test.entity';
+import { TestEntity } from '../../entities/test.entity';
+import { DbErrException } from '../../exceptions/internal-server-error.exception';
+import { TestDao } from './test.dao';
 
 @Injectable()
 export class TestService {
-  constructor(@InjectModel('test') private readonly testModel: Model<TestEntity>) {}
+  constructor(private readonly testDao: TestDao) {}
 
-  findByName(name: string): Promise<TestEntity[]> {
-    return this.testModel.find({ name }).exec();
+  async findByName(name: string): Promise<TestEntity[]> {
+    try {
+      return await this.testDao.findByName(name);
+    }
+    catch(err) {
+      console.error('[srj] db err: ', err);
+
+      throw new DbErrException();
+    }
   }
 }

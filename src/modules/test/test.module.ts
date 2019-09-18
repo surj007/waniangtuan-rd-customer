@@ -3,7 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { TestController } from './test.controller';
 import { TestService } from './test.service';
-import { TestModel } from './test.model';
+import { TestDao } from './test.dao';
+import { TestModel } from '../../models/test.model';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { TestModel } from './test.model';
   ],
   exports: [],
   controllers: [ TestController ],
-  providers: [ TestService ]
+  providers: [ TestService, TestDao ]
 })
 export class TestModule {}

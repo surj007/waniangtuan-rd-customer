@@ -16,3 +16,9 @@ export interface HttpsOptionsInterface {
   readonly key: Buffer;
   readonly cert: Buffer;
 }
+
+export interface Log4jsCategoriesInterface { 
+  appenders: string[];
+  level: string;
+  enableCallStack?: boolean;
+}

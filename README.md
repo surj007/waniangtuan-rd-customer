@@ -10,8 +10,5 @@ npm run pre-test
 npm run prod
 
 #### TODO
-0、session过期中间件、request-id  
 1、登陆  
-2、oss + 文件上传  
-3、log  
-4、swagger
+2、oss + 文件上传

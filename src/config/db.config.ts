@@ -3,7 +3,8 @@ import { DbConfigInterface, DbOptInterface } from '../interfaces/config.interfac
 let dbConfig: DbConfigInterface = <DbConfigInterface>{};
 let dbOpt: DbOptInterface = <DbOptInterface>{
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useCreateIndex: true
 };
 let dbUri: string = '';
 
@@ -12,7 +13,7 @@ if (process.env.NODE_ENV === 'dev') {
     username: '',
     password: '',
     uri: 'localhost:27017',
-    database: 'test'
+    database: 'waniangtuan'
   };
 }
 else {

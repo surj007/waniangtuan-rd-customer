@@ -1,3 +1,7 @@
 export enum ResCodeEnum {
-  Success
+  Success,
+  Unauthorized,
+  DbErr,
+  WxApiErr,
+  InvalidWxSignature
 }
