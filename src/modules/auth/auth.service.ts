@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 
 import { UserInfoRequestDto } from './auth.dto';
 import { WxApi } from '../../api/wx.api';
-import { WxOpenIdAndSessionKeyResIntreface } from '../../interfaces/wx.interface';
+import { WxOpenIdAndSessionKeyResIntreface, WxDecryptData } from '../../interfaces/wx.interface';
 import { WX_APP_ID, WX_APP_SECRET } from '../../utils/constants.util';
 import { AuthDao } from './auth.dao';
 import { encrypt } from '../../utils/crypto.util';
-import { WxApiErrException } from '../../exceptions/internal-server-error.exception';
+import { WxApiErrException, DbErrException } from '../../exceptions/internal-server-error.exception';
 import { InvalidWxSignatureException } from '../../exceptions/bad-request.exception';
+import { LoginUserInfoInterface } from '../../interfaces/common.interface';
+import WXBizDataCrypt = require('../../libs/WXBizDataCrypt');
 
 @Injectable()
 export class AuthService {
@@ -22,12 +24,12 @@ export class AuthService {
     return signature === encrypt('sha1', rawData + sessionKey);
   }
 
-  decryptData(sessionKey: string, encryptedData: string, iv: string): string {
-    return '1'
-    // return new WXBizDataCrypt(WX_APP_ID, sessionKey).decryptData(encryptedData , iv);
+  decryptData(sessionKey: string, encryptedData: string, iv: string): WxDecryptData {
+    return new WXBizDataCrypt(WX_APP_ID, sessionKey).decryptData(encryptedData , iv);
   }
 
-  async login(userInfo: UserInfoRequestDto): Promise<null> {
+  async login(userInfo: UserInfoRequestDto): Promise<LoginUserInfoInterface> {
+    delete userInfo.locationInfo.errMsg;
     let openIdAndSessionKeyRes: WxOpenIdAndSessionKeyResIntreface = <WxOpenIdAndSessionKeyResIntreface>{};
 
     try {
@@ -48,10 +50,25 @@ export class AuthService {
     }
 
     const decryptData = this.decryptData(openIdAndSessionKeyRes.session_key, userInfo.encryptedData, userInfo.iv);
+    const loginUserInfo: LoginUserInfoInterface = {
+      unionId: decryptData.unionId || 'aa',
+      openId: openIdAndSessionKeyRes.openid,
+      loginCode: userInfo.loginCode,
+      iv: userInfo.iv,
+      sessionKey : openIdAndSessionKeyRes.session_key,
+      locationInfo: userInfo.locationInfo,
+      ...userInfo.userInfo
+    };
 
-    console.info(decryptData);
-    console.info(openIdAndSessionKeyRes.openid);
-    this.authDao.login({});
-    return Promise.resolve(null);
+    try {
+      await this.authDao.login(loginUserInfo);
+
+      return Promise.resolve(loginUserInfo);
+    }
+    catch(err) {
+      console.error('[srj] db err: ', err);
+
+      throw new DbErrException();
+    }
   }
 }

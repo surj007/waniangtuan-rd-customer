@@ -21,6 +21,6 @@ try {
   fs.writeFileSync(path.join(modulePath, moduleName + '.controller' + '.ts'), '');
   fs.writeFileSync(path.join(modulePath, moduleName + '.controller.spec' + '.ts'), '');
 } 
-catch (err) {
+catch(err) {
   console.error(err);
 }

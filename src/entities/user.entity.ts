@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 
-import { WxLocationInterface } from '../interfaces/user.interface';
+import { WxLocationInterface } from '../interfaces/wx.interface';
 
 export interface UserEntity extends Document {
   unionId: string;
@@ -14,7 +14,7 @@ export interface UserEntity extends Document {
   country: string;
   province: string;
   city: string;
-  location: WxLocationInterface;
+  locationInfo: WxLocationInterface;
   like: number;
   powderedMilk: number;
   doorIds: number[];

@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "alwaysStrict": true,
     "target": "es2017",
     "module": "commonjs",
@@ -19,8 +20,10 @@
     "noImplicitReturns": true,
     "incremental": true
   },
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
-    "node_modules", 
-    "dist"
+    "**/*spec.ts"
   ]
 }

@@ -52,7 +52,7 @@ export const UserModel = new Schema(
     // 用户所在城市
     city: String,
     // 用户当前位置
-    location: {
+    locationInfo: {
       type: {
         // 纬度，范围为 -90~90，负数表示南纬
         latitude: Number,

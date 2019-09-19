@@ -9,6 +9,9 @@ npm run pre-test
 ### 生产环境
 npm run prod
 
+### 添加模块
+npm run module --name=xxx
+
 #### TODO
 1、登陆  
 2、oss + 文件上传

@@ -2,13 +2,17 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nes
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
+import { ExpressSessionInterface } from '../interfaces/express.interface';
+
 @Injectable()
 export class ExtendSessionExpireInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    let session: ExpressSessionInterface = <ExpressSessionInterface>(context.switchToHttp().getRequest().session);
+    
     return next.handle().pipe(tap(() => {
-      if (context.switchToHttp().getRequest().session.userInfo) {
-        context.switchToHttp().getRequest().session._garbage = Date();
-        context.switchToHttp().getRequest().session.touch();
+      if (session.userInfo) {
+        session._garbage = Date();
+        session.touch();
       }
     }));
   }

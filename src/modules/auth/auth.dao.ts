@@ -3,13 +3,22 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { UserEntity } from '../../entities/user.entity';
-import { LoginUserInfoInterface } from './auth.interface';
+import { LoginUserInfoInterface } from '../../interfaces/common.interface';
 
 @Injectable()
 export class AuthDao {
   constructor(@InjectModel('user') private readonly userModel: Model<UserEntity>) {}
 
-  login(loginUserInfo: LoginUserInfoInterface): Promise<UserEntity[]> {
-    return this.userModel.find({ name: 1 }).exec();
+  login(loginUserInfo: LoginUserInfoInterface): Promise<null> {
+    return this.userModel.updateOne(
+      {
+        unionId: loginUserInfo.unionId,
+        openId: loginUserInfo.openId
+      }, 
+      loginUserInfo,
+      { 
+        upsert: true, 
+        setDefaultsOnInsert: true 
+      }).exec();
   }
 }

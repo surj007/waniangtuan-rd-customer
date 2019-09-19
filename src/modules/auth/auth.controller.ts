@@ -1,10 +1,12 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, Session } from '@nestjs/common';
 import { ApiUseTags, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { createSuccessCommonRes } from '../../utils/response.util';
 import { CommonResDto } from '../../dto/commonRes.dto';
 import { UserInfoRequestDto } from './auth.dto';
+import { LoginUserInfoInterface } from '../../interfaces/common.interface';
+import { ExpressSessionInterface } from '../../interfaces/express.interface';
 
 @Controller('/auth')
 @ApiUseTags('auth')
@@ -24,9 +26,14 @@ export class AuthController {
   @ApiOkResponse({
     description: '登陆成功会在header中返回set-cookie'
   })
-  async login(@Body() userInfo: UserInfoRequestDto): Promise<CommonResDto<null>> {
-    return createSuccessCommonRes<null>(
-      await this.authService.login(userInfo)
-    );
+  async login(
+    @Body() userInfo: UserInfoRequestDto,
+    @Session() session: ExpressSessionInterface
+  ): Promise<CommonResDto<null>> {
+    const loginUserInfo: LoginUserInfoInterface = await this.authService.login(userInfo);
+
+    session.userInfo = loginUserInfo;
+
+    return createSuccessCommonRes<null>(null);
   }
 }

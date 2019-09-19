@@ -21,7 +21,7 @@ export class TestController {
    * @params name 用户名
    * @return 用户数据
    */
-  @Get()
+  @Get('/getUserInfoByUsername')
   @ApiOperation({ title: '测试接口，根据用户名获取用户数据' })
   @ApiOkResponse({
     type: TestSwaggerClass,

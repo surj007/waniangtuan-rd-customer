@@ -49,4 +49,5 @@ export class WxLocationDto {
   @IsInt()
   @ApiModelProperty()
   readonly verticalAccuracy: number;
+  errMsg?: string;
 }
