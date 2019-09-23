@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
-import { WxUserInfoDto, WxLocationDto } from '../../dto/user.dto';
+import { WxUserInfoDto, WxLocationDto } from '../../dto/wx.dto';
 
 export class UserInfoRequestDto {
   @IsString()

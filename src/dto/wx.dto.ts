@@ -51,3 +51,14 @@ export class WxLocationDto {
   readonly verticalAccuracy: number;
   errMsg?: string;
 }
+
+export interface WxOpenIdAndSessionKeyReqestDto {
+  readonly appid: string;
+  readonly secret: string;
+  readonly js_code: string;
+}
+
+export interface WxOpenIdAndSessionKeyResponseDto {
+  readonly session_key: string;
+  readonly openid: string;
+}

@@ -4,12 +4,13 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import { UserEntity } from '../../entities/user.entity';
 import { LoginUserInfoInterface } from '../../interfaces/common.interface';
+import { UpdateSuccessResultInterface } from '../../interfaces/mongoose.interface';
 
 @Injectable()
 export class AuthDao {
   constructor(@InjectModel('user') private readonly userModel: Model<UserEntity>) {}
 
-  login(loginUserInfo: LoginUserInfoInterface): Promise<null> {
+  login(loginUserInfo: LoginUserInfoInterface): Promise<UpdateSuccessResultInterface> {
     return this.userModel.updateOne(
       {
         unionId: loginUserInfo.unionId,
@@ -19,6 +20,7 @@ export class AuthDao {
       { 
         upsert: true, 
         setDefaultsOnInsert: true 
-      }).exec();
+      }
+    ).exec();
   }
 }

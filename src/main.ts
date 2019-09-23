@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { readFileSync } from 'fs';
@@ -13,27 +13,26 @@ import * as compression from 'compression';
 import { HttpsOptionsInterface } from './interfaces/config.interface';
 import { AppModule } from './modules/app.module';
 import { ExtendSessionExpireInterceptor } from './interceptors/extend-session-expire.interceptor';
-import './config/redis.config';
+import { SuccessResponseWrapInterceptor } from './interceptors/success-response-wrap.interceptor';
+import { AllExceptionFilter } from './exceptions/all-exception.filter';
+import { DbErrExceptionFilter } from './exceptions/db-err-exception.filter';
+import { ApiErrExceptionFilter } from './exceptions/api-err-exception.filter';
+import { redisSessionDbClient } from './config/redis.config';
+import envConfig from './config/env.config';
 import './config/log.config';
 
-let port: number = -1;
 const redisStore: connectRedis.RedisStore = connectRedis(expressSession);
 const httpsOptions: HttpsOptionsInterface = {
   key: readFileSync(join(__dirname, '../static/ssl/www.waniangt.com.key')),
   cert: readFileSync(join(__dirname, '../static/ssl/www.waniangt.com.pem'))
 };
 
-if (process.env.NODE_ENV == 'pre-test') {
-  port = 8001;
-}
-else {
-  port = 8000;
-}
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    httpsOptions
+    httpsOptions,
+    logger: envConfig.appLogger
   });
+  const { httpAdapter } = app.get(HttpAdapterHost);
 
   app.use(expressSession({
     secret: 'waniangtuan-secret',
@@ -43,7 +42,7 @@ async function bootstrap() {
     },
     resave: false,
     saveUninitialized: false,
-    store: new redisStore({ client: (<any>global).redisClient })
+    store: new redisStore({ client: redisSessionDbClient })
   }));
   app.use(compression());
   app.use(helmet());
@@ -55,7 +54,11 @@ async function bootstrap() {
   }));
 
   app.useGlobalInterceptors(new ExtendSessionExpireInterceptor());
+  app.useGlobalInterceptors(new SuccessResponseWrapInterceptor());
   app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new AllExceptionFilter(httpAdapter));
+  app.useGlobalFilters(new DbErrExceptionFilter());
+  app.useGlobalFilters(new ApiErrExceptionFilter());
   app.setGlobalPrefix('api');
 
   SwaggerModule.setup('swagger', app, SwaggerModule.createDocument(app, new DocumentBuilder()
@@ -65,13 +68,13 @@ async function bootstrap() {
     .build()
   ));
 
-  await app.listen(port, () => {
-    console.warn('[srj] listen 8000...');
+  await app.listen(envConfig.port, () => {
+    console.warn(`[srj] listen ${envConfig.port}...`);
   });
 }
 
 bootstrap();
 
-process.on('uncaughtException', (err: Error): void => {
+process.on('uncaughtException', (err) => {
   console.error('[srj] uncaughtException: ', err);
 });

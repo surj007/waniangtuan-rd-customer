@@ -1,24 +1,7 @@
 // 日志等级 trace、debug、info、warn、error、fatal、mark
 import * as log4js from 'log4js';
 
-import { Log4jsCategoriesInterface } from '../interfaces/config.interface';
-
-let defaultLog4jsCategoriesInterface: Log4jsCategoriesInterface = <Log4jsCategoriesInterface>{};
-
-if (process.env.NODE_ENV === 'dev') {
-  defaultLog4jsCategoriesInterface = {
-    appenders: [ 'stdout' ],
-    level: 'info',
-    enableCallStack: true
-  };
-}
-else {
-  defaultLog4jsCategoriesInterface = {
-    appenders: [ 'dateLog' ],
-    level: 'warn',
-    enableCallStack: true
-  };
-}
+import envConfig from '../config/env.config';
 
 log4js.configure({
   appenders: {
@@ -41,7 +24,7 @@ log4js.configure({
     }
   },
   categories: {
-    default: defaultLog4jsCategoriesInterface
+    default: envConfig.defaultLog4jsCategories
   },
   pm2: true
 });

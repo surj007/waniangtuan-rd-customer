@@ -1,16 +1,35 @@
+import { HttpException } from '@nestjs/common';
+
 import { WxLocationInterface } from './wx.interface';
 
 export interface LoginUserInfoInterface {
-  unionId: string;
-  openId: string;
-  loginCode: string;
-  iv: string;
-  sessionKey : string;
-  nickName: string;
-  avatarUrl: string;
-  gender: number;
-  country: string;
-  province: string;
-  city: string;
-  locationInfo: WxLocationInterface;
+  readonly unionId: string;
+  readonly openId: string;
+  readonly loginCode: string;
+  readonly iv: string;
+  readonly sessionKey : string;
+  readonly nickName: string;
+  readonly avatarUrl: string;
+  readonly gender: number;
+  readonly country: string;
+  readonly province: string;
+  readonly city: string;
+  readonly locationInfo: WxLocationInterface;
+}
+
+export interface UploadFileInterface {
+  readonly fieldname: string;
+  readonly originalname: string;
+  readonly encoding: string;
+  readonly mimetype: string;
+  readonly buffer: Buffer;
+  readonly size: number;
+}
+
+export interface DbErrExceptionInterface extends HttpException {
+  getResponse(): {
+    readonly err: Error;
+    readonly type?: string;
+    readonly consoleMessage?: string;
+  };
 }

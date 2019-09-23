@@ -1,42 +1,86 @@
-import { CommonResDto } from '../dto/commonRes.dto';
-import { ResCodeEnum } from '../enum/response.enum';
+import { ValidationError } from 'class-validator';
 
-export function createSuccessCommonRes<T>(data: T, msg: string = 'ok'): CommonResDto<T> {
+import { CommonResponseDto } from '../dto/common.dto';
+import { ResponseCodeEnum } from '../enum/response.enum';
+
+export function createSuccessCommonResponse(data: any, message: string = 'ok'): CommonResponseDto {
   return {
-    code: ResCodeEnum.Success,
-    msg,
+    code: ResponseCodeEnum.Success,
+    message,
     data
   };
 }
 
-export function createUnauthorizedCommonRes(): CommonResDto<null> {
+export function createUnauthorizedCommonResponse(): CommonResponseDto<null> {
   return {
-    code: ResCodeEnum.Unauthorized,
-    msg: '请登陆',
+    code: ResponseCodeEnum.Unauthorized,
+    message: '请登陆',
     data: null
   };
 }
 
-export function createDbErrCommonRes(): CommonResDto<null> {
+export function createDbErrCommonResponse(): CommonResponseDto<null> {
   return {
-    code: ResCodeEnum.DbErr,
-    msg: '网络错误，请稍后重试',
+    code: ResponseCodeEnum.DbErr,
+    message: '网络错误，请稍后重试',
     data: null
   };
 }
 
-export function createWxApiErrCommonRes(): CommonResDto<null> {
+export function createApiErrCommonResponse(): CommonResponseDto<null> {
   return {
-    code: ResCodeEnum.WxApiErr,
-    msg: '网络错误，请稍后重试',
+    code: ResponseCodeEnum.ApiError,
+    message: '网络错误，请稍后重试',
     data: null
   };
 }
 
-export function createInvalidWxSignatureCommonRes(): CommonResDto<null> {
+export function createInvalidWxSignatureCommonResponse(): CommonResponseDto<null> {
   return {
-    code: ResCodeEnum.InvalidWxSignature,
-    msg: '网络错误，请稍后重试',
+    code: ResponseCodeEnum.InvalidWxSignature,
+    message: '网络错误，请稍后重试',
     data: null
+  };
+}
+
+export function createInvalidUploadFileTypeCommonResponse(): CommonResponseDto<null> {
+  return {
+    code: ResponseCodeEnum.InvalidUploadFile,
+    message: '只支持上传png、jpg、jpeg、gif格式的文件',
+    data: null
+  };
+}
+
+export function createInvalidUploadFileSizeCommonResponse(): CommonResponseDto<null> {
+  return {
+    code: ResponseCodeEnum.InvalidUploadFile,
+    message: '只支持上传大于0并且小于10M的文件',
+    data: null
+  };
+}
+
+export function createUnhandleExceptionCommonResponse(): CommonResponseDto<null> {
+  return {
+    code: ResponseCodeEnum.UnhandleException,
+    message: '网络错误，请稍后重试',
+    data: null
+  };
+}
+
+export function createUploadFileEmptyCommonResponse(): CommonResponseDto<null> {
+  return {
+    code: ResponseCodeEnum.InvalidPayload,
+    message: '必须上传文件',
+    data: null
+  };
+}
+
+export function createInvalidPayloadCommonResponse(
+  data: ValidationError[] | string
+): CommonResponseDto<ValidationError[] | string> {
+  return {
+    code: ResponseCodeEnum.InvalidPayload,
+    message: '参数错误',
+    data
   };
 }

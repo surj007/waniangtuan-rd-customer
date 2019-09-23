@@ -82,7 +82,7 @@ export const UserModel = new Schema(
     },
 
     // 用户拥有的娃娃id
-    doorIds: {
+    dollIds: {
       type: [ Number ],
       default: []
     },
@@ -92,7 +92,7 @@ export const UserModel = new Schema(
       default: []
     },
     // 用户发布的状态id
-    stateIds: {
+    momentIds: {
       type: [ Number ],
       default: []
     },

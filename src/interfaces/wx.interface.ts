@@ -1,14 +1,3 @@
-export interface WxOpenIdAndSessionKeyReqIntreface {
-  appid: string;
-  secret: string;
-  js_code: string;
-}
-
-export interface WxOpenIdAndSessionKeyResIntreface {
-  session_key: string;
-  openid: string;
-}
-
 export interface WxLocationInterface {
   readonly latitude: number;
   readonly longitude: number;
@@ -20,5 +9,5 @@ export interface WxLocationInterface {
 
 export interface WxDecryptData {
   readonly unionId: string;
-  [ key: string ]: any;
+  readonly [ key: string ]: any;
 }

@@ -1,22 +1,40 @@
-import * as redis from 'redis';
+import { RedisClient, createClient } from 'redis';
 
-const redisClient = redis.createClient({
+import { RedisDbEnum } from '../enum/config.enum';
+
+export const redisSessionDbClient: RedisClient = createClient({
   host: '127.0.0.1',
-  port: 6379
+  port: 6379,
+  db: RedisDbEnum.SessionDb
 });
 
-redisClient.on('ready', (err) => {
-  if (err) {        
-    console.error('[srj] connect redis err: ', err);
-
-    return;
-  }
-
-  console.debug('[srj] connect redis success');
+export const redisCacheDbClient: RedisClient = createClient({
+  host: '127.0.0.1',
+  port: 6379,
+  db: RedisDbEnum.CacheDb
 });
 
-redisClient.on('error', (err) => {
-  console.error('[srj] redis err: ', err);
+export const redisCustomerDbClient: RedisClient = createClient({
+  host: '127.0.0.1',
+  port: 6379,
+  db: RedisDbEnum.CustomerDb
 });
 
-(<any>global).redisClient = redisClient;
+function listenRedisEvent(redisClient: RedisClient, db: RedisDbEnum): void {
+  redisClient.on('ready', (err) => {
+    if (err !== undefined) {        
+      console.error(`[srj] connect redis db ${db} err: `, err);
+    }
+    else {
+      console.debug(`[srj] connect redis db ${db} success`);
+    }
+  });
+  
+  redisClient.on('error', (err) => {
+    console.error(`[srj] redis db ${db} err: `, err);
+  });
+}
+
+listenRedisEvent(redisSessionDbClient, RedisDbEnum.SessionDb);
+listenRedisEvent(redisCacheDbClient, RedisDbEnum.CacheDb);
+listenRedisEvent(redisCustomerDbClient, RedisDbEnum.CustomerDb);

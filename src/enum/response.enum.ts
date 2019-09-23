@@ -1,7 +1,11 @@
-export enum ResCodeEnum {
+export enum ResponseCodeEnum {
   Success,
-  Unauthorized,
   DbErr,
-  WxApiErr,
+  ApiError,
+  UnhandleException,
+  Unauthorized,
+  // request格式错误
+  InvalidPayload,
+  InvalidUploadFile,
   InvalidWxSignature
 }

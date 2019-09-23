@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 
 import { UserInfoRequestDto } from './auth.dto';
 import { WxApi } from '../../api/wx.api';
-import { WxOpenIdAndSessionKeyResIntreface, WxDecryptData } from '../../interfaces/wx.interface';
+import { WxDecryptData } from '../../interfaces/wx.interface';
+import { WxOpenIdAndSessionKeyResponseDto } from '../../dto/wx.dto';
 import { WX_APP_ID, WX_APP_SECRET } from '../../utils/constants.util';
 import { AuthDao } from './auth.dao';
 import { encrypt } from '../../utils/crypto.util';
-import { WxApiErrException, DbErrException } from '../../exceptions/internal-server-error.exception';
+import { ApiErrException, DbErrException } from '../../exceptions/internal-server-error.exception';
 import { InvalidWxSignatureException } from '../../exceptions/bad-request.exception';
 import { LoginUserInfoInterface } from '../../interfaces/common.interface';
 import WXBizDataCrypt = require('../../libs/WXBizDataCrypt');
@@ -30,32 +31,30 @@ export class AuthService {
 
   async login(userInfo: UserInfoRequestDto): Promise<LoginUserInfoInterface> {
     delete userInfo.locationInfo.errMsg;
-    let openIdAndSessionKeyRes: WxOpenIdAndSessionKeyResIntreface = <WxOpenIdAndSessionKeyResIntreface>{};
+    let openIdAndSessionKeyResponse: WxOpenIdAndSessionKeyResponseDto = <WxOpenIdAndSessionKeyResponseDto>{};
 
     try {
-      openIdAndSessionKeyRes = await this.wxApi.getOpenIdAndSessionKeyByLoginCode({
+      openIdAndSessionKeyResponse = await this.wxApi.getOpenIdAndSessionKeyByLoginCode({
         appid: WX_APP_ID,
         secret: WX_APP_SECRET,
         js_code: userInfo.loginCode
       });
     }
     catch(err) {
-      console.error('[srj] getOpenIdAndSessionKeyByLoginCode http err: ', err);
-
-      throw new WxApiErrException();
+      throw new ApiErrException('wx api get openId and sessionkey err', err);
     }
 
-    if (!this.validateWxSignature(userInfo.rawData, userInfo.signature, openIdAndSessionKeyRes.session_key)) {
+    if (!this.validateWxSignature(userInfo.rawData, userInfo.signature, openIdAndSessionKeyResponse.session_key)) {
       throw new InvalidWxSignatureException();
     }
 
-    const decryptData = this.decryptData(openIdAndSessionKeyRes.session_key, userInfo.encryptedData, userInfo.iv);
+    const decryptData = this.decryptData(openIdAndSessionKeyResponse.session_key, userInfo.encryptedData, userInfo.iv);
     const loginUserInfo: LoginUserInfoInterface = {
-      unionId: decryptData.unionId || 'aa',
-      openId: openIdAndSessionKeyRes.openid,
+      unionId: decryptData.unionId,
+      openId: openIdAndSessionKeyResponse.openid,
       loginCode: userInfo.loginCode,
       iv: userInfo.iv,
-      sessionKey : openIdAndSessionKeyRes.session_key,
+      sessionKey : openIdAndSessionKeyResponse.session_key,
       locationInfo: userInfo.locationInfo,
       ...userInfo.userInfo
     };
@@ -63,12 +62,10 @@ export class AuthService {
     try {
       await this.authDao.login(loginUserInfo);
 
-      return Promise.resolve(loginUserInfo);
+      return loginUserInfo;
     }
     catch(err) {
-      console.error('[srj] db err: ', err);
-
-      throw new DbErrException();
+      throw new DbErrException(err, 'mongodb');
     }
   }
 }

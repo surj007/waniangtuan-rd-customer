@@ -1,19 +1,13 @@
-import { Module, HttpModule } from "@nestjs/common";
-import { MongooseModule } from '@nestjs/mongoose';
+import { Module,  } from "@nestjs/common";
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { WxApi } from '../../api/wx.api';
 import { AuthDao } from './auth.dao';
-import { UserModel } from '../../models/user.model';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: 'user', schema: UserModel }]),
-    HttpModule
-  ],
+  imports: [],
   exports: [],
   controllers: [ AuthController ],
-  providers: [ AuthService, AuthDao, WxApi ]
+  providers: [ AuthService, AuthDao ]
 })
 export class AuthModule {}
