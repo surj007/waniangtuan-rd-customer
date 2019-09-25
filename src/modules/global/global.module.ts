@@ -1,3 +1,4 @@
+/// <reference path="../../typings/index.d.ts" />
 import { Module, Global, HttpModule, DynamicModule, CacheModule } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { MongooseModule } from '@nestjs/mongoose';

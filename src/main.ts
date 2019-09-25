@@ -1,37 +1,27 @@
 import { NestFactory, HttpAdapterHost } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, INestApplication } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import * as expressSession from 'express-session';
 import * as connectRedis from 'connect-redis';
 import * as helmet from 'helmet';
-// import * as csurf from 'csurf';
 import * as rateLimit from 'express-rate-limit';
 import * as compression from 'compression';
+// import * as csurf from 'csurf';
 
-import { HttpsOptionsInterface } from './interfaces/config.interface';
 import { AppModule } from './modules/app.module';
 import { ExtendSessionExpireInterceptor } from './interceptors/extend-session-expire.interceptor';
 import { SuccessResponseWrapInterceptor } from './interceptors/success-response-wrap.interceptor';
 import { AllExceptionFilter } from './exceptions/all-exception.filter';
 import { DbErrExceptionFilter } from './exceptions/db-err-exception.filter';
 import { ApiErrExceptionFilter } from './exceptions/api-err-exception.filter';
+import { CustomGlobalInterface } from './interfaces/common.interface';
 import { redisSessionDbClient } from './config/redis.config';
 import envConfig from './config/env.config';
 import './config/log.config';
 
 const redisStore: connectRedis.RedisStore = connectRedis(expressSession);
-const httpsOptions: HttpsOptionsInterface = {
-  key: readFileSync(join(__dirname, '../static/ssl/www.waniangt.com.key')),
-  cert: readFileSync(join(__dirname, '../static/ssl/www.waniangt.com.pem'))
-};
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    httpsOptions,
-    logger: envConfig.appLogger
-  });
+export function setAppGlobalComponent(app: INestApplication) {
   const { httpAdapter } = app.get(HttpAdapterHost);
 
   app.use(expressSession({
@@ -60,15 +50,23 @@ async function bootstrap() {
   app.useGlobalFilters(new DbErrExceptionFilter());
   app.useGlobalFilters(new ApiErrExceptionFilter());
   app.setGlobalPrefix('api');
+}
+
+async function bootstrap() {
+  const app: INestApplication = await NestFactory.create(AppModule, envConfig.serverOptions);
+  
+  setAppGlobalComponent(app);
 
   SwaggerModule.setup('swagger', app, SwaggerModule.createDocument(app, new DocumentBuilder()
     .setTitle('waniangtuan-miniprogram-api')
     .setVersion('0.1')
-    .setSchemes('https')
+    .setSchemes('http', 'https')
     .build()
   ));
 
   await app.listen(envConfig.port, () => {
+    (<CustomGlobalInterface>global).app = app;
+
     console.warn(`[srj] listen ${envConfig.port}...`);
   });
 }

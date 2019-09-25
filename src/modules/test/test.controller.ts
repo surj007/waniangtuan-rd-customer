@@ -30,9 +30,13 @@ import { ExpressSessionWithUserInfoInterface } from '../../interfaces/express.in
 
 @Controller('/test')
 @ApiUseTags('test')
-@UseGuards(AuthGuard)
 export class TestController {
   constructor(private readonly testService: TestService) {}
+
+  @Get('/getUserInfoByUsernameSimple')
+  getUserInfoByUsernameSimple(@Query('name') name: string): Promise<TestEntity[]> {
+    return this.testService.getUserInfoByUsername(name);
+  }
 
   /**
    * @method 根据用户名获取用户数据
@@ -42,6 +46,7 @@ export class TestController {
    * @return 用户数据
    */
   @Get('/getUserInfoByUsername')
+  @UseGuards(AuthGuard)
   @UseInterceptors(new CacheRelatedModelInterceptor([ 'test', 'user' ]), SetCustomerCacheInterceptor)
   @ApiOperation({ title: '测试接口，根据用户名获取用户数据' })
   @ApiImplicitHeader({ name: 'cookie' })
@@ -57,6 +62,7 @@ export class TestController {
 
   @Post('/postMoment')
   @HttpCode(200)
+  @UseGuards(AuthGuard)
   @UseInterceptors(new CacheRelatedModelInterceptor([ 'test', 'user' ]), DelCustomerCacheInterceptor)
   @ApiOperation({ title: '测试接口，发布带图片的状态' })
   @ApiImplicitHeader({ name: 'cookie' })

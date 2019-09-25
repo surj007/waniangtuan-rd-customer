@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { RedisClient } from 'redis';
 
-import { redisCacheDbClient, redisCustomerDbClient } from '../../../config/redis.config';
+import { 
+  redisCacheDbClient, 
+  redisCustomerDbClient
+} from '../../../config/redis.config';
 import { RedisDbEnum } from '../../../enum/config.enum';
 
 @Injectable()
@@ -9,7 +12,13 @@ export class RedisService {
   private readonly redisCacheDbClient: RedisClient = redisCacheDbClient;
   private readonly redisCustomerDbClient: RedisClient = redisCustomerDbClient;
 
-  getRedisClient(db: RedisDbEnum): RedisClient | null {
+  constructor() {
+    this.setStringIfNotExist('customer:currentDollId', '10001').catch(err => {
+      console.error('[srj] redis init set current doll id err: ', err);
+    });
+  }
+
+  getRedisClient(db: RedisDbEnum): RedisClient {
     switch (db) {
       case RedisDbEnum.CacheDb: {
         return this.redisCacheDbClient;
@@ -20,17 +29,13 @@ export class RedisService {
       }
     
       default: {
-        return null;
+        return this.redisCustomerDbClient;
       }
     }
   }
 
   getKeys(pattern: string, db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<string[]> {
-    let redisClient: RedisClient = this.redisCustomerDbClient;
-
-    if (db === RedisDbEnum.CacheDb) {
-      redisClient = this.redisCacheDbClient
-    }
+    const redisClient: RedisClient = this.getRedisClient(db);
 
     return new Promise((resolve, reject) => {
       redisClient.keys(pattern, (err, results) => {
@@ -43,20 +48,58 @@ export class RedisService {
     });
   }
 
-  del(keys: string[], db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<any> {
-    let redisClient: RedisClient = this.redisCustomerDbClient;
-
-    if (db === RedisDbEnum.CacheDb) {
-      redisClient = this.redisCacheDbClient
-    }
+  getString(key: string, db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<string> {
+    const redisClient: RedisClient = this.getRedisClient(db);
 
     return new Promise((resolve, reject) => {
-      redisClient.del(keys, (err, results) => {
+      redisClient.get(key, (err, result) => {
         if (err !== null) {
           reject(err);
         }
 
-        resolve(results);
+        resolve(result);
+      });
+    });
+  }
+
+  setStringIfNotExist(key: string, data: string, db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<any> {
+    const redisClient: RedisClient = this.getRedisClient(db);
+
+    return new Promise((resolve, reject) => {
+      redisClient.set(key, data, 'NX', (err, setResult) => {
+        if (err !== null) {
+          reject(err);
+        }
+
+        resolve(setResult);
+      });
+    });
+  }
+
+  del(keys: string[], db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<any> {
+    const redisClient: RedisClient = this.getRedisClient(db);
+
+    return new Promise((resolve, reject) => {
+      redisClient.del(keys, (err, result) => {
+        if (err !== null) {
+          reject(err);
+        }
+
+        resolve(result);
+      });
+    });
+  }
+
+  incr(key: string, db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<number> {
+    const redisClient: RedisClient = this.getRedisClient(db);
+
+    return new Promise((resolve, reject) => {
+      redisClient.incr(key, (err, result) => {
+        if (err !== null) {
+          reject(err);
+        }
+
+        resolve(result);
       });
     });
   }

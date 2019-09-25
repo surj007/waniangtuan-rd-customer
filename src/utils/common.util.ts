@@ -19,3 +19,7 @@ export function isValidFileSize(size: number): boolean {
 export function getRandomString(): string {
   return Math.random().toString(36).substr(2);
 }
+
+export function jsonClone<T, E>(data: T): E {
+  return JSON.parse(JSON.stringify(data));
+}

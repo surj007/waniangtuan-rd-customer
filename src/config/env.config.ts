@@ -1,6 +1,14 @@
-import { Logger } from '@nestjs/common';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
-import { EnvConfigInterface } from '../interfaces/config.interface';
+import { 
+  EnvConfigInterface, HttpsOptionsInterface
+} from '../interfaces/config.interface';
+
+const httpsOptions: HttpsOptionsInterface = {
+  key: readFileSync(join(__dirname, '../../static/ssl/www.waniangt.com.key')),
+  cert: readFileSync(join(__dirname, '../../static/ssl/www.waniangt.com.pem'))
+};
 
 const envConfig: EnvConfigInterface = {
   dev: {
@@ -23,7 +31,7 @@ const envConfig: EnvConfigInterface = {
         useCreateIndex: true
       }
     },
-    appLogger: new Logger()
+    serverOptions: {}
   },
   'pre-test': {
     port: 8999,
@@ -46,7 +54,10 @@ const envConfig: EnvConfigInterface = {
         replicaSet: 'mgset-500120530'
       }
     },
-    appLogger: false
+    serverOptions: {
+      httpsOptions,
+      logger: false
+    }
   },
   prod: {
     port: 8000,
@@ -69,7 +80,10 @@ const envConfig: EnvConfigInterface = {
         replicaSet: 'mgset-500120530'
       }
     },
-    appLogger: false
+    serverOptions: {
+      httpsOptions,
+      logger: false
+    }
   }
 }
 

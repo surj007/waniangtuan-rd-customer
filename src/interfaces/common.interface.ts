@@ -1,4 +1,4 @@
-import { HttpException } from '@nestjs/common';
+import { HttpException, INestApplication } from '@nestjs/common';
 
 import { WxLocationInterface } from './wx.interface';
 
@@ -32,4 +32,8 @@ export interface DbErrExceptionInterface extends HttpException {
     readonly type?: string;
     readonly consoleMessage?: string;
   };
+}
+
+export interface CustomGlobalInterface extends NodeJS.Global {
+  app: INestApplication;
 }

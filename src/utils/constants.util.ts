@@ -10,3 +10,7 @@ export const FILE_TYPE_PNG_CODE: string = '8950';
 export const FILE_TYPE_JPG_CODE: string = 'ffd8';
 export const FILE_TYPE_GIF_CODE: string = '4749';
 export const VALID_FILE_SIZE: number = 10485760;
+
+export const SPECIAL_DOLL_ID: number[] = [
+  
+];

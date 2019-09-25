@@ -2,7 +2,7 @@ import { Document } from 'mongoose';
 
 import { WxLocationInterface } from '../interfaces/wx.interface';
 
-export interface UserEntity extends Document {
+export interface UserEntity {
   readonly unionId: string;
   readonly openId: string;
   readonly loginCode: string;
@@ -24,3 +24,5 @@ export interface UserEntity extends Document {
   readonly createTime: number;
   readonly updateTime: number;
 }
+
+export interface UserEntityWithMongooseDocument extends UserEntity, Document {}

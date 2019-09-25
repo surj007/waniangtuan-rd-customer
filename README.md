@@ -21,7 +21,5 @@ npm run module --name=xxx
 ```
 
 #### TODO
-1. 单元测试
-2. debug模式
-3. bytenode
-4. 索引
+1. 索引
+2. getUserInfo上传接口

@@ -1,5 +1,3 @@
-import { Logger } from '@nestjs/common';
-
 interface DbOptInterface {
   readonly poolSize?: number;
   readonly replicaSet?: string;
@@ -28,16 +26,19 @@ interface SingleEnvConfigInterface {
     readonly info: DbInfoInterface,
     readonly opt: DbOptInterface
   },
-  readonly appLogger: Logger | boolean;
+  readonly serverOptions: {
+    readonly httpsOptions?: HttpsOptionsInterface,
+    readonly logger?: boolean
+  };
+}
+
+export interface HttpsOptionsInterface { 
+  readonly key: Buffer;
+  readonly cert: Buffer;
 }
 
 export interface EnvConfigInterface { 
   readonly dev: SingleEnvConfigInterface;
   readonly 'pre-test': SingleEnvConfigInterface;
   readonly prod: SingleEnvConfigInterface;
-}
-
-export interface HttpsOptionsInterface { 
-  readonly key: Buffer;
-  readonly cert: Buffer;
 }

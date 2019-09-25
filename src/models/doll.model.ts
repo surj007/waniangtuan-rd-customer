@@ -1,7 +1,12 @@
 import { Schema } from 'mongoose';
 
+import { RedisService } from '../modules/global/services/redis.service';
+import { CustomGlobalInterface } from '../interfaces/common.interface';
+import { DbErrException } from '../exceptions/internal-server-error.exception';
+
 export const DollModel = new Schema(
   {
+    // 娃娃id
     id: {
       type: Number,
       unique: true,
@@ -41,3 +46,19 @@ export const DollModel = new Schema(
     versionKey: false
   }
 );
+
+DollModel.pre('save', async function(next) {
+  const redisService: RedisService = (<CustomGlobalInterface>global).app.get(RedisService);
+  let currentDollId: number;
+
+  try {
+    currentDollId = await redisService.incr('customer:currentDollId');
+  }
+  catch(err) {
+    throw new DbErrException(err, 'redis');
+  }
+
+  this.id = currentDollId;
+
+  next();
+});
