@@ -6,6 +6,10 @@ import * as connectRedis from 'connect-redis';
 import * as helmet from 'helmet';
 import * as rateLimit from 'express-rate-limit';
 import * as compression from 'compression';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import * as spdy from 'spdy';
+import * as http from 'http';
+import * as https from 'https';
 // import * as csurf from 'csurf';
 
 import { AppModule } from './modules/app.module';
@@ -15,11 +19,29 @@ import { AllExceptionFilter } from './exceptions/all-exception.filter';
 import { DbErrExceptionFilter } from './exceptions/db-err-exception.filter';
 import { ApiErrExceptionFilter } from './exceptions/api-err-exception.filter';
 import { CustomGlobalInterface } from './interfaces/common.interface';
-import { redisSessionDbClient } from './config/redis.config';
+import { CustomNestApplicationOptions, HttpsOptionsInterface } from './interfaces/config.interface';
+import { redisClient } from './config/redis.config';
 import envConfig from './config/env.config';
 import './config/log.config';
 
 const redisStore: connectRedis.RedisStore = connectRedis(expressSession);
+
+class CustomExpressAdapter extends ExpressAdapter {
+  public initHttpServer(options: CustomNestApplicationOptions) {
+    const isHttp2Enabled: boolean | undefined = options && options.httpsOptions && options.http2;
+    const isHttpsEnabled: HttpsOptionsInterface | undefined = options && options.httpsOptions;
+
+    if(isHttp2Enabled) {
+      this.httpServer = spdy.createServer(<HttpsOptionsInterface>(options.httpsOptions), this.getInstance());
+    }
+    else if(isHttpsEnabled) {
+      this.httpServer = https.createServer(<HttpsOptionsInterface>(options.httpsOptions), this.getInstance());
+    }
+    else {
+      this.httpServer = http.createServer(this.getInstance());
+    }
+  }
+}
 
 export function setAppGlobalComponent(app: INestApplication) {
   const { httpAdapter } = app.get(HttpAdapterHost);
@@ -27,12 +49,12 @@ export function setAppGlobalComponent(app: INestApplication) {
   app.use(expressSession({
     secret: 'waniangtuan-secret',
     cookie: {
-      // 30天
-      maxAge: 30 * 24 * 60 * 60 * 1000
+      // 1天
+      maxAge: 24 * 60 * 60 * 1000
     },
     resave: false,
     saveUninitialized: false,
-    store: new redisStore({ client: redisSessionDbClient })
+    store: new redisStore({ client: redisClient })
   }));
   app.use(compression());
   app.use(helmet());
@@ -53,7 +75,7 @@ export function setAppGlobalComponent(app: INestApplication) {
 }
 
 async function bootstrap() {
-  const app: INestApplication = await NestFactory.create(AppModule, envConfig.serverOptions);
+  const app: INestApplication = await NestFactory.create(AppModule, new CustomExpressAdapter(), envConfig.serverOptions);
   
   setAppGlobalComponent(app);
 

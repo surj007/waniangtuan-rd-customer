@@ -8,7 +8,7 @@ import {
 import { TestDao } from './test.dao';
 import { OssService } from '../global/services/oss.service';
 import { CopyFileOnOssResponseDto } from '../../dto/oss.dto';
-import { CustomerCopyFileOnOssResponseDto } from '../../dto/oss.dto';
+import { CustomCopyFileOnOssResponseDto } from '../../dto/oss.dto';
 import { PostMomentRequestDto } from './test.dto';
 
 @Injectable()
@@ -43,7 +43,7 @@ export class TestService {
       try {
         await this.testDao.postMoment({
           content: postMomentData.content,
-          images: copyFileOnOssResponseArray.map(copyFileOnOssResponse => (<CustomerCopyFileOnOssResponseDto>copyFileOnOssResponse).res.requestUrls[0]),
+          images: copyFileOnOssResponseArray.map(copyFileOnOssResponse => (<CustomCopyFileOnOssResponseDto>copyFileOnOssResponse).res.requestUrls[0]),
         });
 
         return null;

@@ -1,3 +1,5 @@
+import { NestApplicationOptions } from '@nestjs/common';
+
 interface DbOptInterface {
   readonly poolSize?: number;
   readonly replicaSet?: string;
@@ -27,18 +29,23 @@ interface SingleEnvConfigInterface {
     readonly opt: DbOptInterface
   },
   readonly serverOptions: {
+    readonly http2?: boolean,
     readonly httpsOptions?: HttpsOptionsInterface,
     readonly logger?: boolean
   };
 }
 
 export interface HttpsOptionsInterface { 
-  readonly key: Buffer;
-  readonly cert: Buffer;
+  readonly key?: Buffer;
+  readonly cert?: Buffer;
 }
 
 export interface EnvConfigInterface { 
   readonly dev: SingleEnvConfigInterface;
   readonly 'pre-test': SingleEnvConfigInterface;
   readonly prod: SingleEnvConfigInterface;
+}
+
+export interface CustomNestApplicationOptions extends NestApplicationOptions {
+  http2?: boolean;
 }

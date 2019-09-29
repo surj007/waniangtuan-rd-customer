@@ -15,7 +15,7 @@ const envConfig: EnvConfigInterface = {
     port: 8000,
     defaultLog4jsCategories: {
       appenders: [ 'stdout' ],
-      level: 'info',
+      level: 'debug',
       enableCallStack: true
     },
     mongodb: {
@@ -37,7 +37,7 @@ const envConfig: EnvConfigInterface = {
     port: 8999,
     defaultLog4jsCategories: {
       appenders: [ 'dateLog' ],
-      level: 'warn',
+      level: 'debug',
       enableCallStack: true
     },
     mongodb: {
@@ -55,8 +55,8 @@ const envConfig: EnvConfigInterface = {
       }
     },
     serverOptions: {
-      httpsOptions,
-      logger: false
+      http2: true,
+      httpsOptions
     }
   },
   prod: {
@@ -81,6 +81,7 @@ const envConfig: EnvConfigInterface = {
       }
     },
     serverOptions: {
+      http2: true,
       httpsOptions,
       logger: false
     }

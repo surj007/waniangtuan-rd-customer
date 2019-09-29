@@ -21,7 +21,6 @@ export const TestModel = new Schema(
     }
   },
   { 
-    collection: 'test', 
-    versionKey: false 
+    collection: 'test' 
   }
 );

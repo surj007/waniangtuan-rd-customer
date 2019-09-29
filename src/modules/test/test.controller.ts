@@ -21,9 +21,9 @@ import { TestEntity } from '../../entities/test.entity';
 import { AuthGuard } from '../../guards/auth.guard';
 import { CacheRelatedModelInterceptor } from '../../interceptors/cache-related-model.interceptor';
 import { 
-  SetCustomerCacheInterceptor,
-  DelCustomerCacheInterceptor
-} from '../../interceptors/customer-cache.interceptor';
+  SetCustomCacheInterceptor,
+  DelCustomCacheInterceptor
+} from '../../interceptors/custom-cache.interceptor';
 import { QueryParamRequiredValidatePipe } from '../../pipe/query-param-validate.pipe';
 import { GetUserInfoByUsernameResponseDto, PostMomentRequestDto } from './test.dto';
 import { ExpressSessionWithUserInfoInterface } from '../../interfaces/express.interface';
@@ -47,7 +47,7 @@ export class TestController {
    */
   @Get('/getUserInfoByUsername')
   @UseGuards(AuthGuard)
-  @UseInterceptors(new CacheRelatedModelInterceptor([ 'test', 'user' ]), SetCustomerCacheInterceptor)
+  @UseInterceptors(new CacheRelatedModelInterceptor([ 'test', 'user' ]), SetCustomCacheInterceptor)
   @ApiOperation({ title: '测试接口，根据用户名获取用户数据' })
   @ApiImplicitHeader({ name: 'cookie' })
   @ApiOkResponse({
@@ -63,7 +63,7 @@ export class TestController {
   @Post('/postMoment')
   @HttpCode(200)
   @UseGuards(AuthGuard)
-  @UseInterceptors(new CacheRelatedModelInterceptor([ 'test', 'user' ]), DelCustomerCacheInterceptor)
+  @UseInterceptors(new CacheRelatedModelInterceptor([ 'test', 'user' ]), DelCustomCacheInterceptor)
   @ApiOperation({ title: '测试接口，发布带图片的状态' })
   @ApiImplicitHeader({ name: 'cookie' })
   postMoment(

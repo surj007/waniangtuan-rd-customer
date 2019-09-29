@@ -2,8 +2,8 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nes
 import { Observable } from 'rxjs';
 
 import { 
-  RequestCustomerDataInterface, 
-  ExpressRequestWithCustomerDataInterface 
+  RequestCustomDataInterface, 
+  ExpressRequestWithCustomDataInterface 
 } from '../interfaces/express.interface';
 
 @Injectable()
@@ -11,10 +11,10 @@ export class CacheRelatedModelInterceptor implements NestInterceptor {
   constructor(private readonly relatedModel: string[]) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const req: ExpressRequestWithCustomerDataInterface = context.switchToHttp().getRequest<ExpressRequestWithCustomerDataInterface>();
+    const req: ExpressRequestWithCustomDataInterface = context.switchToHttp().getRequest<ExpressRequestWithCustomDataInterface>();
 
     if (req._data === undefined) {
-      req._data = <RequestCustomerDataInterface>{};
+      req._data = <RequestCustomDataInterface>{};
     }
 
     req._data.cacheRelatedModel = this.relatedModel;

@@ -16,7 +16,9 @@ export class AllExceptionFilter extends BaseExceptionFilter {
     if (!(exception instanceof HttpException)) {
       console.error(`[srj] [${res.get('X-Request-Id')}] unhandle code exception: `, exception);
 
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(createUnhandleExceptionCommonResponse());
+      res
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(createUnhandleExceptionCommonResponse());
     }
     else if (
       exception.getStatus() === 400 && 
@@ -26,6 +28,15 @@ export class AllExceptionFilter extends BaseExceptionFilter {
       res
         .status(HttpStatus.BAD_REQUEST)
         .json(createInvalidPayloadCommonResponse(exception.message.message));
+    }
+    else if (
+      exception.getStatus() === 400 &&
+      exception.message.message &&
+      exception.message.message === 'Unexpected field'
+    ) {
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .json(createInvalidPayloadCommonResponse('[file] field is required'));
     }
     else {
       super.catch(exception, host);

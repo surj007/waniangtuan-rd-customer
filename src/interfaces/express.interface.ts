@@ -23,12 +23,12 @@ export interface ExpressSessionWithUserInfoInterface {
   touch(): any;
 }
 
-export interface RequestCustomerDataInterface {
+export interface RequestCustomDataInterface {
   cacheRelatedModel?: string[];
 }
 
-export interface ExpressRequestWithCustomerDataInterface extends Request {
-  _data: RequestCustomerDataInterface;
+export interface ExpressRequestWithCustomDataInterface extends Request {
+  _data: RequestCustomDataInterface;
 }
 
 export interface ExpressRequestWithFileInterface extends Request {

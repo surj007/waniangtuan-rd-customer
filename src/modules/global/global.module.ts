@@ -10,7 +10,6 @@ import { TestModel } from '../../models/test.model';
 import { DollModel } from '../../models/doll.model';
 import { RedisService } from './services/redis.service';
 import { OssService } from './services/oss.service';
-import { RedisDbEnum } from '../../enum/config.enum';
 import { TerminusOptionsService } from './services/terminus-options.service';
 
 const UserModelModule: DynamicModule = MongooseModule.forFeature([{ 
@@ -40,9 +39,8 @@ const TestModelModule: DynamicModule = MongooseModule.forFeature([{
       store: cacheManagerRedisStore,
       host: 'localhost',
       port: 6379,
-      db: RedisDbEnum.CacheDb,
       ttl: 5 * 60,
-      max: 200
+      max: 1000
     })
   ],
   controllers: [],

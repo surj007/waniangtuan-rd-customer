@@ -8,7 +8,7 @@ export interface CopyFileOnOssResponseDto {
   readonly res: object;
 }
 
-export interface CustomerCopyFileOnOssResponseDto {
+export interface CustomCopyFileOnOssResponseDto {
   readonly data: object;
   readonly res: {
     readonly requestUrls: string[];

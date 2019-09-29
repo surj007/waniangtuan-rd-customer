@@ -1,44 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { RedisClient } from 'redis';
 
-import { 
-  redisCacheDbClient, 
-  redisCustomerDbClient
-} from '../../../config/redis.config';
-import { RedisDbEnum } from '../../../enum/config.enum';
+import { redisClient } from '../../../config/redis.config';
 
 @Injectable()
 export class RedisService {
-  private readonly redisCacheDbClient: RedisClient = redisCacheDbClient;
-  private readonly redisCustomerDbClient: RedisClient = redisCustomerDbClient;
+  private readonly redisClient: RedisClient = redisClient;
 
   constructor() {
-    this.setStringIfNotExist('customer:currentDollId', '10001').catch(err => {
+    this.setStringIfNotExist('data:doll:currentDollId:string', '10001').catch(err => {
       console.error('[srj] redis init set current doll id err: ', err);
     });
   }
 
-  getRedisClient(db: RedisDbEnum): RedisClient {
-    switch (db) {
-      case RedisDbEnum.CacheDb: {
-        return this.redisCacheDbClient;
-      }
-      
-      case RedisDbEnum.CustomerDb: {
-        return this.redisCustomerDbClient;
-      }
-    
-      default: {
-        return this.redisCustomerDbClient;
-      }
-    }
+  getRedisClient(): RedisClient {
+    return this.redisClient;
   }
 
-  getKeys(pattern: string, db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<string[]> {
-    const redisClient: RedisClient = this.getRedisClient(db);
+  setSet(key: string, members: string[]): Promise<number> {
+    const redisClient: RedisClient = this.getRedisClient();
 
     return new Promise((resolve, reject) => {
-      redisClient.keys(pattern, (err, results) => {
+      redisClient.sadd(key, members, (err, result) => {
+        if (err !== null) {
+          reject(err);
+        }
+
+        resolve(result);
+      });
+    });
+  }
+
+  getAllSetMembers(key: string): Promise<string[]> {
+    const redisClient: RedisClient = this.getRedisClient();
+
+    return new Promise((resolve, reject) => {
+      redisClient.smembers(key, (err, results) => {
         if (err !== null) {
           reject(err);
         }
@@ -48,8 +45,22 @@ export class RedisService {
     });
   }
 
-  getString(key: string, db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<string> {
-    const redisClient: RedisClient = this.getRedisClient(db);
+  delSetMembers(key: string, members: string[]): Promise<number> {
+    const redisClient: RedisClient = this.getRedisClient();
+
+    return new Promise((resolve, reject) => {
+      redisClient.srem(key, members, (err, results) => {
+        if (err !== null) {
+          reject(err);
+        }
+
+        resolve(results);
+      });
+    });
+  }
+
+  getString(key: string): Promise<string> {
+    const redisClient: RedisClient = this.getRedisClient();
 
     return new Promise((resolve, reject) => {
       redisClient.get(key, (err, result) => {
@@ -62,22 +73,22 @@ export class RedisService {
     });
   }
 
-  setStringIfNotExist(key: string, data: string, db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<any> {
-    const redisClient: RedisClient = this.getRedisClient(db);
+  setStringIfNotExist(key: string, data: string): Promise<'OK'> {
+    const redisClient: RedisClient = this.getRedisClient();
 
     return new Promise((resolve, reject) => {
-      redisClient.set(key, data, 'NX', (err, setResult) => {
+      redisClient.set(key, data, 'NX', (err, result) => {
         if (err !== null) {
           reject(err);
         }
 
-        resolve(setResult);
+        resolve(result);
       });
     });
   }
 
-  del(keys: string[], db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<any> {
-    const redisClient: RedisClient = this.getRedisClient(db);
+  delByKeys(keys: string[]): Promise<number> {
+    const redisClient: RedisClient = this.getRedisClient();
 
     return new Promise((resolve, reject) => {
       redisClient.del(keys, (err, result) => {
@@ -90,8 +101,8 @@ export class RedisService {
     });
   }
 
-  incr(key: string, db: RedisDbEnum = RedisDbEnum.CustomerDb): Promise<number> {
-    const redisClient: RedisClient = this.getRedisClient(db);
+  incrString(key: string): Promise<number> {
+    const redisClient: RedisClient = this.getRedisClient();
 
     return new Promise((resolve, reject) => {
       redisClient.incr(key, (err, result) => {

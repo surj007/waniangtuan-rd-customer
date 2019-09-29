@@ -110,7 +110,6 @@ export const UserModel = new Schema(
       createdAt: 'createTime',
       // 当前表项更新时间
       updatedAt: 'updateTime'
-    },
-    versionKey: false
+    }
   }
 );

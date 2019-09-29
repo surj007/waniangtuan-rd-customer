@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 import ossClient from '../../../config/oss.config';
 import { UploadFileInterface } from '../../../interfaces/common.interface';
-import { UploadFileToOssResponseDto, CopyFileOnOssResponseDto } from '../../../dto/oss.dto';
+import { 
+  UploadFileToOssResponseDto, 
+  CopyFileOnOssResponseDto 
+} from '../../../dto/oss.dto';
 import { getRandomString } from '../../../utils/common.util';
 
 @Injectable()

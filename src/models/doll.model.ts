@@ -42,8 +42,7 @@ export const DollModel = new Schema(
       createdAt: 'createTime',
       // 当前表项更新时间
       updatedAt: 'updateTime'
-    },
-    versionKey: false
+    }
   }
 );
 
@@ -52,7 +51,7 @@ DollModel.pre('save', async function(next) {
   let currentDollId: number;
 
   try {
-    currentDollId = await redisService.incr('customer:currentDollId');
+    currentDollId = await redisService.incrString('data:doll:currentDollId:string');
   }
   catch(err) {
     throw new DbErrException(err, 'redis');
