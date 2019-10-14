@@ -7,7 +7,6 @@ import { WxOpenIdAndSessionKeyResponseDto } from '../../dto/wx.dto';
 import { WX_APP_ID, WX_APP_SECRET } from '../../utils/constants.util';
 import { AuthDao } from './auth.dao';
 import { encrypt } from '../../utils/crypto.util';
-import { ApiErrException, DbErrException } from '../../exceptions/internal-server-error.exception';
 import { InvalidWxSignatureException } from '../../exceptions/bad-request.exception';
 import { LoginUserInfoInterface } from '../../interfaces/common.interface';
 import WXBizDataCrypt = require('../../libs/WXBizDataCrypt');
@@ -31,18 +30,12 @@ export class AuthService {
 
   async login(userInfo: UserInfoRequestDto): Promise<LoginUserInfoInterface> {
     delete userInfo.locationInfo.errMsg;
-    let openIdAndSessionKeyResponse: WxOpenIdAndSessionKeyResponseDto = <WxOpenIdAndSessionKeyResponseDto>{};
 
-    try {
-      openIdAndSessionKeyResponse = await this.wxApi.getOpenIdAndSessionKeyByLoginCode({
-        appid: WX_APP_ID,
-        secret: WX_APP_SECRET,
-        js_code: userInfo.loginCode
-      });
-    }
-    catch(err) {
-      throw new ApiErrException('wx api get openId and sessionkey err', err);
-    }
+    const openIdAndSessionKeyResponse: WxOpenIdAndSessionKeyResponseDto = await this.wxApi.getOpenIdAndSessionKeyByLoginCode({
+      appid: WX_APP_ID,
+      secret: WX_APP_SECRET,
+      js_code: userInfo.loginCode
+    });
 
     if (!this.validateWxSignature(userInfo.rawData, userInfo.signature, openIdAndSessionKeyResponse.session_key)) {
       throw new InvalidWxSignatureException();
@@ -59,13 +52,8 @@ export class AuthService {
       ...userInfo.userInfo
     };
 
-    try {
-      await this.authDao.login(loginUserInfo);
+    await this.authDao.login(loginUserInfo);
 
-      return loginUserInfo;
-    }
-    catch(err) {
-      throw new DbErrException(err, 'mongodb');
-    }
+    return loginUserInfo;
   }
 }

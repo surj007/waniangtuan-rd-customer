@@ -7,17 +7,23 @@ import {
   CopyFileOnOssResponseDto 
 } from '../../../dto/oss.dto';
 import { getRandomString } from '../../../utils/common.util';
+import { ApiErrException } from '../../../exceptions/internal-server-error.exception';
 
 @Injectable()
 export class OssService {
-  uploadFileToOssWithExpire(
+  async uploadFileToOssWithExpire(
     file: UploadFileInterface,
     userUnionId: string
   ): Promise<UploadFileToOssResponseDto> {
-    return ossClient.put(
-      `miniprogram/image/tmp/${userUnionId}/${getRandomString()}${Date.now()}${file.originalname}`, 
-      file.buffer
-    );
+    try {
+      return await ossClient.put(
+        `miniprogram/image/tmp/${userUnionId}/${getRandomString()}${Date.now()}${file.originalname}`, 
+        file.buffer
+      );
+    }
+    catch(err) {
+      throw new ApiErrException('oss api upload file err', err);
+    }
   }
 
   signatureUrl(url: string): string {
@@ -27,16 +33,21 @@ export class OssService {
     });
   }
 
-  moveFileToStorage(filePath: string, userUnionId: string): Promise<CopyFileOnOssResponseDto> {
+  async moveFileToStorage(filePath: string, userUnionId: string): Promise<CopyFileOnOssResponseDto> {
     if (filePath.indexOf(userUnionId) === -1) {
       return Promise.reject('invalid file with unionId');
     }
 
     const filePathArray = filePath.split(`${userUnionId}/`);
 
-    return ossClient.copy(
-      `miniprogram/image/storage/${userUnionId}/${filePathArray[1]}`,
-      `miniprogram/image/tmp/${userUnionId}/${filePathArray[1]}`
-    );
+    try {
+      return await ossClient.copy(
+        `miniprogram/image/storage/${userUnionId}/${filePathArray[1]}`,
+        `miniprogram/image/tmp/${userUnionId}/${filePathArray[1]}`
+      );
+    }
+    catch(err) {
+      throw new ApiErrException('oss api move file to storage err', err);
+    }
   }
 }

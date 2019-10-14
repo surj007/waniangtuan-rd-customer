@@ -26,7 +26,10 @@ export class SetCustomCacheInterceptor extends CacheInterceptor {
       return undefined;
     }
 
-    redisService.setSet('interface:keys:set', [ `interface:${req._data.cacheRelatedModel}:${httpAdapter.getRequestUrl(req)}:string` ]).catch(err => {
+    redisService.setSet(
+      'interface:keys:set', 
+      [ `interface:${req._data.cacheRelatedModel}:${httpAdapter.getRequestUrl(req)}:string` ]
+    ).catch(err => {
       console.error(`[srj] [${res.get('X-Request-Id')}] redis set interface:keys:set err: `, err);
     });
 

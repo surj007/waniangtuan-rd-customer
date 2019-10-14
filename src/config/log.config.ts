@@ -1,4 +1,4 @@
-// 日志等级 trace、debug、info、warn、error、fatal、mark
+// 日志等级trace、debug、info、warn、error、fatal、mark
 import * as log4js from 'log4js';
 
 import envConfig from '../config/env.config';

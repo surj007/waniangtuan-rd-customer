@@ -7,22 +7,28 @@ import {
 } from '../../entities/user.entity';
 import { LoginUserInfoInterface } from '../../interfaces/common.interface';
 import { UpdateSuccessResultInterface } from '../../interfaces/mongoose.interface';
+import { DbErrException } from '../../exceptions/internal-server-error.exception';
 
 @Injectable()
 export class AuthDao {
   constructor(@InjectModel('user') private readonly userModel: Model<UserEntityWithMongooseDocument>) {}
 
-  login(loginUserInfo: LoginUserInfoInterface): Promise<UpdateSuccessResultInterface> {
-    return this.userModel.updateOne(
-      {
-        unionId: loginUserInfo.unionId,
-        openId: loginUserInfo.openId
-      }, 
-      loginUserInfo,
-      { 
-        upsert: true, 
-        setDefaultsOnInsert: true 
-      }
-    ).exec();
+  async login(loginUserInfo: LoginUserInfoInterface): Promise<UpdateSuccessResultInterface> {
+    try {
+      return await this.userModel.updateOne(
+        {
+          unionId: loginUserInfo.unionId,
+          openId: loginUserInfo.openId
+        }, 
+        loginUserInfo,
+        { 
+          upsert: true, 
+          setDefaultsOnInsert: true 
+        }
+      ).exec();
+    }
+    catch(err) {
+      throw new DbErrException(err, 'mongodb');
+    }
   }
 }

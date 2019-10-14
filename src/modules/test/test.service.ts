@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
 import { TestEntity } from '../../entities/test.entity';
-import { 
-  DbErrException,
-  ApiErrException 
-} from '../../exceptions/internal-server-error.exception';
 import { TestDao } from './test.dao';
 import { OssService } from '../global/services/oss.service';
 import { CopyFileOnOssResponseDto } from '../../dto/oss.dto';
@@ -19,12 +15,7 @@ export class TestService {
   ) {}
 
   async getUserInfoByUsername(name: string): Promise<TestEntity[]> {
-    try {
-      return await this.testDao.getUserInfoByUsername(name);
-    }
-    catch(err) {
-      throw new DbErrException(err, 'mongodb');
-    }
+    return await this.testDao.getUserInfoByUsername(name);
   }
 
   async postMoment(
@@ -37,23 +28,13 @@ export class TestService {
       promiseArray.push(this.ossService.moveFileToStorage(i, userUnionId));
     }
 
-    try {
-      const copyFileOnOssResponseArray: CopyFileOnOssResponseDto[] = await Promise.all(promiseArray);
+    const copyFileOnOssResponseArray: CopyFileOnOssResponseDto[] = await Promise.all(promiseArray);
 
-      try {
-        await this.testDao.postMoment({
-          content: postMomentData.content,
-          images: copyFileOnOssResponseArray.map(copyFileOnOssResponse => (<CustomCopyFileOnOssResponseDto>copyFileOnOssResponse).res.requestUrls[0]),
-        });
+    await this.testDao.postMoment({
+      content: postMomentData.content,
+      images: copyFileOnOssResponseArray.map(copyFileOnOssResponse => (<CustomCopyFileOnOssResponseDto>copyFileOnOssResponse).res.requestUrls[0]),
+    });
 
-        return null;
-      }
-      catch(err) {
-        throw new DbErrException(err, 'mongodb');
-      }
-    }
-    catch(err) {
-      throw new ApiErrException('oss api move file to storage err', err);
-    }
+    return null;
   }
 }
