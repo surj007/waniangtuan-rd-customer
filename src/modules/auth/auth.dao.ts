@@ -11,6 +11,7 @@ import { DbErrException } from '../../exceptions/internal-server-error.exception
 
 @Injectable()
 export class AuthDao {
+  // Model中能获取到db connnection handle
   constructor(@InjectModel('user') private readonly userModel: Model<UserEntityWithMongooseDocument>) {}
 
   async login(loginUserInfo: LoginUserInfoInterface): Promise<UpdateSuccessResultInterface> {

@@ -42,7 +42,7 @@ const envConfig: EnvConfigInterface = {
     },
     mongodb: {
       info: {
-        username: 'root',
+        username: 'waniangtuan',
         password: 'Aa12345!',
         uri: 'dds-8vb36d53188005341.mongodb.zhangbei.rds.aliyuncs.com:3717,dds-8vb36d53188005342.mongodb.zhangbei.rds.aliyuncs.com:3717',
         database: 'waniangtuan'
@@ -68,7 +68,7 @@ const envConfig: EnvConfigInterface = {
     },
     mongodb: {
       info: {
-        username: 'root',
+        username: 'waniangtuan',
         password: 'Aa12345!',
         uri: 'dds-8vb36d53188005341.mongodb.zhangbei.rds.aliyuncs.com:3717,dds-8vb36d53188005342.mongodb.zhangbei.rds.aliyuncs.com:3717',
         database: 'waniangtuan'
@@ -81,7 +81,7 @@ const envConfig: EnvConfigInterface = {
       }
     },
     serverOptions: {
-      http2: true,
+      http2: false,
       httpsOptions,
       logger: false
     }

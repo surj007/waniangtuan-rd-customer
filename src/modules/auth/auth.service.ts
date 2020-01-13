@@ -29,8 +29,6 @@ export class AuthService {
   }
 
   async login(userInfo: UserInfoRequestDto): Promise<LoginUserInfoInterface> {
-    delete userInfo.locationInfo.errMsg;
-
     const openIdAndSessionKeyResponse: WxOpenIdAndSessionKeyResponseDto = await this.wxApi.getOpenIdAndSessionKeyByLoginCode({
       appid: WX_APP_ID,
       secret: WX_APP_SECRET,

@@ -22,3 +22,4 @@ npm run module --name=xxx
 
 #### TODO
 1. 索引
+2. 添加404格式

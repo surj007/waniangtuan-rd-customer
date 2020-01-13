@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsDefined } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
 import { WxUserInfoDto, WxLocationDto } from '../../dto/wx.dto';
@@ -12,6 +12,7 @@ export class UserInfoRequestDto {
   @IsNotEmpty()
   @ApiModelProperty()
   readonly encryptedData: string;
+  @IsDefined()
   @ApiModelProperty()
   readonly userInfo: WxUserInfoDto;
   @IsString()
@@ -26,6 +27,7 @@ export class UserInfoRequestDto {
   @IsNotEmpty()
   @ApiModelProperty()
   readonly rawData: string;
+  @IsDefined()
   @ApiModelProperty()
   readonly locationInfo: WxLocationDto;
 }
